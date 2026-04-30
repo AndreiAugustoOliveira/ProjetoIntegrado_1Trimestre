@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdlib.h>
+#include <stdio.h>
 #include "st7735\st7735.h"
 /* USER CODE END Includes */
 
@@ -93,6 +94,9 @@ int main(void)
   ST7735_Init();
 
   ST7735_Test();
+  int seed = HAL_GetTick();
+  srand(seed);
+  int senha = rand() % 10000;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -102,6 +106,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+	    if()
+	  	ST7735_FillScreen(WHITE);
   }
   /* USER CODE END 3 */
 }
