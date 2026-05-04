@@ -104,22 +104,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  GPIO_PinState botao_UP = HAL_GPIO_ReadPin(Button_UP_GPIO_Port, Button_UP_Pin);
-	  if(botao_UP == 0 && senha == 0)
-	  {
-		  int seed = HAL_GetTick();
-		  senha = rand() % 10000;
-		  ST7735_FillScreen(WHITE);
-		  ST7735_WriteString(40, 5, "Insira a senha:", Font_7x10,BLACK,WHITE);
-		  ST7735_WriteString(20, 35, "Subtitulo/texto", Font_7x10,BLACK,WHITE);
-		  ST7735_WriteString(10, 60, "texto muito textato", Font_7x10,BLACK,WHITE);
-		  HAL_Delay(1000);
-		  ST7735_FillScreen(WHITE);
-	  }
-	  else if(botao_UP == 0 && senha != 0)
-	  {
-
-	  }
   }
   /* USER CODE END 3 */
 }
