@@ -92,11 +92,9 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   ST7735_Init();
-
+  int senha = 0;
   ST7735_Test();
-  int seed = HAL_GetTick();
-  srand(seed);
-  int senha = rand() % 10000;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -106,6 +104,22 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  GPIO_PinState botao_UP = HAL_GPIO_ReadPin(Button_UP_GPIO_Port, Button_UP_Pin);
+	  if(botao_UP == 0 && senha == 0)
+	  {
+		  int seed = HAL_GetTick();
+		  senha = rand() % 10000;
+		  ST7735_FillScreen(WHITE);
+		  ST7735_WriteString(40, 5, "Insira a senha:", Font_7x10,BLACK,WHITE);
+		  ST7735_WriteString(20, 35, "Subtitulo/texto", Font_7x10,BLACK,WHITE);
+		  ST7735_WriteString(10, 60, "texto muito textato", Font_7x10,BLACK,WHITE);
+		  HAL_Delay(1000);
+		  ST7735_FillScreen(WHITE);
+	  }
+	  else if(botao_UP == 0 && senha != 0)
+	  {
+
+	  }
   }
   /* USER CODE END 3 */
 }
@@ -202,7 +216,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(ST7735_CS_GPIO_Port, ST7735_CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, ST7735_DC_Pin|ST7735_RES_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, ST7735_DC_Pin|ST7735_RES_Pin|Led_4_Pin|Led_3_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : ST7735_CS_Pin */
   GPIO_InitStruct.Pin = ST7735_CS_Pin;
@@ -211,8 +225,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(ST7735_CS_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : ST7735_DC_Pin ST7735_RES_Pin */
-  GPIO_InitStruct.Pin = ST7735_DC_Pin|ST7735_RES_Pin;
+  /*Configure GPIO pins : ST7735_DC_Pin ST7735_RES_Pin Led_4_Pin Led_3_Pin */
+  GPIO_InitStruct.Pin = ST7735_DC_Pin|ST7735_RES_Pin|Led_4_Pin|Led_3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
