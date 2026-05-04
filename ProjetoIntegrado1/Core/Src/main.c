@@ -97,7 +97,7 @@ int main(void)
   int seed = HAL_GetTick();
   srand(seed);
   int senha = rand() % 10000;
-  //Teste2
+  //Mais um teste
   /* USER CODE END 2 */
 
   /* Infinite loop */
