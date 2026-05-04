@@ -94,10 +94,9 @@ int main(void)
   ST7735_Init();
 
   ST7735_Test();
-  int seed = HAL_GetTick();
-  srand(seed);
-  int senha = rand() % 10000;
-  //Mais um teste
+  int senha = 0, i = 0, senha_input = 0;
+  int nums[4] = {0, 0, 0 , 0};
+  char input_str[6]; // 5 digitos + \0
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -108,14 +107,58 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  GPIO_PinState botao_UP = HAL_GPIO_ReadPin(Button_UP_GPIO_Port, Button_UP_Pin);
+	  GPIO_PinState botao_LEFT = HAL_GPIO_ReadPin(Button_LEFT_GPIO_Port, Button_LEFT_Pin);
+	  GPIO_PinState botao_RIGHT = HAL_GPIO_ReadPin(Button_RIGHT_GPIO_Port, Button_RIGHT_Pin);
+	  GPIO_PinState botao_DOWN = HAL_GPIO_ReadPin(Button_DOWN_GPIO_Port, Button_DOWN_Pin);
 
 	  if(botao_UP == 0 && senha == 0)
 	  {
-		  PasswordGenerator();
+		  senha = PasswordGenerator();
 	  }
-	  else if(botao_UP == 0 && senha != 0)
+	  else if(botao_UP == 0 && senha != 0 && i != 4)
 	  {
+		  if(nums[i] == 9)
+			  nums[i] = 0;
+		  else
+			  nums[i]++;
+		  senha_input = nums[0] * 1000 + nums[1] * 100 + nums[2] * 10 + nums[3];
+		  sprintf(input_str, "%d", senha_input);
+		  ST7735_WriteString(40, 5, input_str, Font_11x18,BLACK,WHITE);
+		  HAL_Delay(200);
+	  }
+	  else if(botao_UP == 0 && i == 4)
+	  {
+		  //int senha_input = nums[0] * 1000 + nums[1] * 100 + nums[2] * 10 + nums[3];
+		  if(senha == senha_input)
+		  {
+			  HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 1);
+			  HAL_Delay(300);
+			  HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 0);
+		  }
+	  }
 
+	  if(botao_LEFT == 0 && i != 0 && senha != 0)
+	  {
+		  i--;
+		  HAL_Delay(200);
+	  }
+
+	  if(botao_RIGHT == 0 && i != 4 && senha != 0)
+	  {
+		  i++;
+		  HAL_Delay(200);
+	  }
+
+	  if(botao_DOWN == 0 && senha != 0 && i != 4)
+	  {
+		  if(nums[i] == 0)
+			  nums[i] = 9;
+		  else
+			  nums[i]--;
+		  senha_input = nums[0] * 1000 + nums[1] * 100 + nums[2] * 10 + nums[3];
+		  sprintf(input_str, "%d", senha_input);
+		  ST7735_WriteString(40, 5, input_str, Font_11x18,BLACK,WHITE);
+		  HAL_Delay(200);
 	  }
   }
   /* USER CODE END 3 */
@@ -232,19 +275,23 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pins : Button_LEFT_Pin Button_DOWN_Pin Button_RIGHT_Pin Button_UP_Pin */
   GPIO_InitStruct.Pin = Button_LEFT_Pin|Button_DOWN_Pin|Button_RIGHT_Pin|Button_UP_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 }
 
 /* USER CODE BEGIN 4 */
-void PasswordGenerator()
+int PasswordGenerator()
 {
 	int seed = HAL_GetTick();
-	senha = rand() % 10000;
+	int senha = rand() % 10000;
 	ST7735_WriteString(20, 35, "Gerando a senha!", Font_7x10,BLACK,WHITE);
 	HAL_Delay(1000);
 	ST7735_FillScreen(WHITE);
+	char input_str[6];
+	sprintf(input_str, "%d", 0);
+	ST7735_WriteString(40, 5, input_str, Font_11x18,BLACK,WHITE);
+	return senha;
 }
 /* USER CODE END 4 */
 
