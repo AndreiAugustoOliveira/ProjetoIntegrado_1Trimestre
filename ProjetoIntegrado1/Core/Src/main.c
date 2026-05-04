@@ -92,9 +92,12 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   ST7735_Init();
-  int senha = 0;
+
   ST7735_Test();
-  ST7735_FillScreen(WHITE);
+  int seed = HAL_GetTick();
+  srand(seed);
+  int senha = rand() % 10000;
+  //Mais um teste
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -105,6 +108,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  GPIO_PinState botao_UP = HAL_GPIO_ReadPin(Button_UP_GPIO_Port, Button_UP_Pin);
+
 	  if(botao_UP == 0 && senha == 0)
 	  {
 		  PasswordGenerator();
@@ -234,7 +238,6 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
 void PasswordGenerator()
 {
 	int seed = HAL_GetTick();
