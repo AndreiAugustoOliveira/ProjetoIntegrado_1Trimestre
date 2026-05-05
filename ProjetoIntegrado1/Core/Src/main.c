@@ -24,7 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdlib.h>
 #include <stdio.h>
-#include "st7735\st7735.h"
+#include "ST7735\st7735.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,6 +46,10 @@ SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
 int Stage = 0;
+int senha = 0, i = 0, senha_input = 0;
+int nums[4] = {0, 0, 0 , 0};
+char input_str[6];
+GPIO_PinState botao_UP, botao_LEFT, botao_RIGHT, botao_DOWN;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -94,9 +98,6 @@ int main(void)
   ST7735_Init();
 
   ST7735_Test();
-  int senha = 0, i = 0, senha_input = 0;
-  int nums[4] = {0, 0, 0 , 0};
-  char input_str[6]; // 5 digitos + \0
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -106,10 +107,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  GPIO_PinState botao_UP = HAL_GPIO_ReadPin(Button_UP_GPIO_Port, Button_UP_Pin);
-	  GPIO_PinState botao_LEFT = HAL_GPIO_ReadPin(Button_LEFT_GPIO_Port, Button_LEFT_Pin);
-	  GPIO_PinState botao_RIGHT = HAL_GPIO_ReadPin(Button_RIGHT_GPIO_Port, Button_RIGHT_Pin);
-	  GPIO_PinState botao_DOWN = HAL_GPIO_ReadPin(Button_DOWN_GPIO_Port, Button_DOWN_Pin);
+	  botao_UP = HAL_GPIO_ReadPin(Button_UP_GPIO_Port, Button_UP_Pin);
+	  botao_LEFT = HAL_GPIO_ReadPin(Button_LEFT_GPIO_Port, Button_LEFT_Pin);
+	  botao_RIGHT = HAL_GPIO_ReadPin(Button_RIGHT_GPIO_Port, Button_RIGHT_Pin);
+	  botao_DOWN = HAL_GPIO_ReadPin(Button_DOWN_GPIO_Port, Button_DOWN_Pin);
 
 	  if(Stage == 0)
 		  Authentication();
@@ -244,9 +245,9 @@ int PasswordGenerator()
 	ST7735_WriteString(20, 35, "Gerando a senha!", Font_7x10,BLACK,WHITE);
 	HAL_Delay(1000);
 	ST7735_FillScreen(WHITE);
-	char input_str[6];
-	sprintf(input_str, "%d", 0);
-	ST7735_WriteString(40, 5, input_str, Font_11x18,BLACK,WHITE);
+	//char input_str[6];
+	//sprintf(input_str, "%d", 0);
+	//ST7735_WriteString(40, 5, input_str, Font_11x18,BLACK,WHITE);
 	return senha;
 }
 
@@ -300,6 +301,11 @@ void Authentication()
 		ST7735_WriteString(40, 5, input_str, Font_11x18,BLACK,WHITE);
 		HAL_Delay(200);
 	}
+}
+
+void ClassLimit()
+{
+
 }
 /* USER CODE END 4 */
 
