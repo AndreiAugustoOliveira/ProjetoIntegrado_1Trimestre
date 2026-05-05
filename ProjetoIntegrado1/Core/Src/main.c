@@ -99,6 +99,7 @@ int main(void)
   ST7735_Init();
 
   ST7735_Test();
+  int Presentes = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -119,6 +120,12 @@ int main(void)
 	  {
 		  ClassLimit();
 	  }
+	  else if (Stage == 2)
+		  Presentes = ControlePresenca();
+	  else if (Stage == 3)
+		  RoomControl();
+	  else if(Stage == 4)
+		  EoDReport();
 
 
   }
@@ -353,6 +360,85 @@ void ClassLimit()
 
 	if(botao_LEFT == 0)
 		Confirm = 0;
+}
+
+int ControlePresenca()
+{
+	bool presenca[students];
+	bool confirm = 0;
+	int id = 0, presentes = 0;
+
+	while(1)
+	{
+		if(botao_UP == 0)
+		{
+			//input manual, já que nao tem o sistema de reconhecimento facial.
+			presenca[id] = 1;
+			HAL_Delay(200);
+		}
+
+		if(botao_RIGHT == 0 && confirm == 0)
+		{
+			//Texto de confirmação
+			confirm = 1;
+		}
+		else if (botao_RIGHT == 0 && confirm == 1)
+		{
+			HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 1);
+			HAL_Delay(300);
+			HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 0);
+			Stage++;
+			for(int j = 0; j < students; j ++)
+			{
+				if(presenca[j] == 1)
+					presentes++;
+			}
+			return presentes;
+		}
+
+	}
+}
+
+void RoomControl()
+{
+	int OutOfRoom = 0;
+	while(1)
+	{
+		botao_UP = HAL_GPIO_ReadPin(Button_UP_GPIO_Port, Button_UP_Pin);
+		botao_LEFT = HAL_GPIO_ReadPin(Button_LEFT_GPIO_Port, Button_LEFT_Pin);
+		botao_RIGHT = HAL_GPIO_ReadPin(Button_RIGHT_GPIO_Port, Button_RIGHT_Pin);
+		botao_DOWN = HAL_GPIO_ReadPin(Button_DOWN_GPIO_Port, Button_DOWN_Pin);
+
+		if(botao_UP == 0 && OutOfRoom != 3)
+		{
+			OutOfRoom++;
+		}
+		else if(botao_UP == 0 && OutOfRoom == 3)
+		{
+			//Mensagem de erro;
+		}
+
+		if(botao_DOWN == 0 && OutOfRoom != 0)
+		{
+			OutOfRoom--;
+		}
+		else if(botao_DOWN == 0 && OutOfRoom == 0)
+		{
+			//Mensagem de erro;
+		}
+
+		if(botao_LEFT == 0 & botao_RIGHT == 0)
+		{
+			//Mensagem de turno encerrado;
+			Stage++;
+			return;
+		}
+	}
+}
+
+void EoDReport()
+{
+	Stage++;
 }
 /* USER CODE END 4 */
 
