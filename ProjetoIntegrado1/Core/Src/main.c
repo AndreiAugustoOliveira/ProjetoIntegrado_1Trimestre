@@ -46,10 +46,11 @@ SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
 int Stage = 0;
-int senha = 0, i = 0, senha_input = 0;
-int nums[4] = {0, 0, 0 , 0};
-char input_str[6];
 GPIO_PinState botao_UP, botao_LEFT, botao_RIGHT, botao_DOWN;
+int nums[4] = {0, 0, 0 , 0};
+int senha = 0, i = 0, senha_input = 0;
+int students = 0;
+bool Confirm = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -115,7 +116,10 @@ int main(void)
 	  if(Stage == 0)
 		  Authentication();
 	  else if(Stage == 1)
-		  Authentication();
+	  {
+		  ClassLimit();
+	  }
+
 
   }
   /* USER CODE END 3 */
@@ -253,6 +257,8 @@ int PasswordGenerator()
 
 void Authentication()
 {
+	char input_str[6];
+
 	if(botao_UP == 0 && senha == 0)
 	{
 		senha = PasswordGenerator();
@@ -275,6 +281,9 @@ void Authentication()
 			HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 1);
 			HAL_Delay(300);
 			HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 0);
+			Stage++;
+			ST7735_FillScreen(WHITE);
+			return;
 		}
 	}
 
@@ -305,7 +314,45 @@ void Authentication()
 
 void ClassLimit()
 {
+	char input_str[2];
 
+	if(botao_RIGHT == 0 && Confirm == 0)
+	{
+		//Texto de confirmação
+		Confirm = 1;
+	}
+	else if(botao_RIGHT == 0 && Confirm == 1)
+	{
+		//Confirmação para usuário
+		//Delay para possibilitar leitura
+		HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 1);
+		HAL_Delay(300);
+		HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 0);
+		Stage++;
+		return;
+	}
+
+	if(botao_UP == 0)
+	{
+		Confirm = 0;
+		students++;
+		HAL_Delay(200);
+		sprintf(input_str, "%d", students);
+		ST7735_WriteString(40, 5, input_str, Font_11x18,BLACK,WHITE);
+
+	}
+
+	if(botao_DOWN == 0)
+	{
+		Confirm = 0;
+		students--;
+		HAL_Delay(200);
+		sprintf(input_str, "%d", students);
+		ST7735_WriteString(40, 5, input_str, Font_11x18,BLACK,WHITE);
+	}
+
+	if(botao_LEFT == 0)
+		Confirm = 0;
 }
 /* USER CODE END 4 */
 
