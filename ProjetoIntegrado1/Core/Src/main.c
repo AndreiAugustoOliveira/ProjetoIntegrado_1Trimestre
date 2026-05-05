@@ -45,7 +45,7 @@
 SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
-
+int Stage = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -111,55 +111,11 @@ int main(void)
 	  GPIO_PinState botao_RIGHT = HAL_GPIO_ReadPin(Button_RIGHT_GPIO_Port, Button_RIGHT_Pin);
 	  GPIO_PinState botao_DOWN = HAL_GPIO_ReadPin(Button_DOWN_GPIO_Port, Button_DOWN_Pin);
 
-	  if(botao_UP == 0 && senha == 0)
-	  {
-		  senha = PasswordGenerator();
-	  }
-	  else if(botao_UP == 0 && senha != 0 && i != 4)
-	  {
-		  if(nums[i] == 9)
-			  nums[i] = 0;
-		  else
-			  nums[i]++;
-		  senha_input = nums[0] * 1000 + nums[1] * 100 + nums[2] * 10 + nums[3];
-		  sprintf(input_str, "%d", senha_input);
-		  ST7735_WriteString(40, 5, input_str, Font_11x18,BLACK,WHITE);
-		  HAL_Delay(200);
-	  }
-	  else if(botao_UP == 0 && i == 4)
-	  {
-		  //int senha_input = nums[0] * 1000 + nums[1] * 100 + nums[2] * 10 + nums[3];
-		  if(senha == senha_input)
-		  {
-			  HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 1);
-			  HAL_Delay(300);
-			  HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 0);
-		  }
-	  }
+	  if(Stage == 0)
+		  Authentication();
+	  else if(Stage == 1)
+		  Authentication();
 
-	  if(botao_LEFT == 0 && i != 0 && senha != 0)
-	  {
-		  i--;
-		  HAL_Delay(200);
-	  }
-
-	  if(botao_RIGHT == 0 && i != 4 && senha != 0)
-	  {
-		  i++;
-		  HAL_Delay(200);
-	  }
-
-	  if(botao_DOWN == 0 && senha != 0 && i != 4)
-	  {
-		  if(nums[i] == 0)
-			  nums[i] = 9;
-		  else
-			  nums[i]--;
-		  senha_input = nums[0] * 1000 + nums[1] * 100 + nums[2] * 10 + nums[3];
-		  sprintf(input_str, "%d", senha_input);
-		  ST7735_WriteString(40, 5, input_str, Font_11x18,BLACK,WHITE);
-		  HAL_Delay(200);
-	  }
   }
   /* USER CODE END 3 */
 }
@@ -292,6 +248,58 @@ int PasswordGenerator()
 	sprintf(input_str, "%d", 0);
 	ST7735_WriteString(40, 5, input_str, Font_11x18,BLACK,WHITE);
 	return senha;
+}
+
+void Authentication()
+{
+	if(botao_UP == 0 && senha == 0)
+	{
+		senha = PasswordGenerator();
+	}
+	else if(botao_UP == 0 && senha != 0 && i != 4)
+	{
+		if(nums[i] == 9)
+			nums[i] = 0;
+		else
+			nums[i]++;
+		senha_input = nums[0] * 1000 + nums[1] * 100 + nums[2] * 10 + nums[3];
+		sprintf(input_str, "%d", senha_input);
+		ST7735_WriteString(40, 5, input_str, Font_11x18,BLACK,WHITE);
+		HAL_Delay(200);
+	}
+	else if(botao_UP == 0 && i == 4)
+	{
+		if(senha == senha_input)
+		{
+			HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 1);
+			HAL_Delay(300);
+			HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 0);
+		}
+	}
+
+	if(botao_LEFT == 0 && i != 0 && senha != 0)
+	{
+		i--;
+		HAL_Delay(200);
+	}
+
+	if(botao_RIGHT == 0 && i != 4 && senha != 0)
+	{
+		i++;
+		HAL_Delay(200);
+	}
+
+	if(botao_DOWN == 0 && senha != 0 && i != 4)
+	{
+		if(nums[i] == 0)
+			nums[i] = 9;
+		else
+			nums[i]--;
+		senha_input = nums[0] * 1000 + nums[1] * 100 + nums[2] * 10 + nums[3];
+		sprintf(input_str, "%d", senha_input);
+		ST7735_WriteString(40, 5, input_str, Font_11x18,BLACK,WHITE);
+		HAL_Delay(200);
+	}
 }
 /* USER CODE END 4 */
 
