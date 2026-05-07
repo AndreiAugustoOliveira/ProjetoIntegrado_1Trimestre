@@ -102,23 +102,49 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	  int muda = 0;
-	  int senha = rand() % 90000 + 10000;
-	  int digitado = 0;
+	  int muda = 3;
 
-
-	  char senha_str[6]; // 5 digitos + \0
-	  sprintf(senha_str, "%d", senha);
-
-	  if( muda == 1 ) {
-	  ST7735_WriteString(40, 5, "Titulo", Font_11x18,BLACK,WHITE);
-	  ST7735_WriteString(20, 35, "Subtitulo/texto", Font_7x10,BLACK,WHITE); }
-
-	  else {
-	 ST7735_FillRectangle(75, 30, 70, 20, BLACK);
-	  ST7735_WriteString(5, 30, "Senha:", Font_11x18,BLACK,WHITE);
-	  ST7735_WriteString(77, 35, senha_str, Font_7x10,BLACK,WHITE);
+	  if (muda == 1){  //funcionalidade 1
+	  ST7735_FillRectangle(75, 10, 70, 20, BLACK);
+	  ST7735_WriteString(5, 10, "Senha:", Font_11x18,BLACK,WHITE);
+	  ST7735_WriteString(77, 15, "12345", Font_7x10,BLACK,WHITE);
+	  ST7735_WriteString(25, 40, "Senha incorreta", Font_7x10,BLACK,WHITE);
 	  ST7735_FillScreen(WHITE); }
+
+	  else if (muda == 2) { //funcionalidade 2
+	  ST7735_WriteString(1, 5,"Defina o numero maximo de alunos", Font_7x10,BLACK,WHITE);
+	  ST7735_FillRectangle(75, 40, 70, 20, BLACK);
+	  ST7735_WriteString(10, 45, "Num Max:", Font_7x10,BLACK,WHITE);
+	  ST7735_WriteString(77, 45,"40", Font_7x10,BLACK,WHITE);
+	  ST7735_FillScreen(WHITE);
+	  }
+
+	  else if (muda == 3) { //funcionalidade 4
+	   ST7735_WriteString(1, 5,"O botao X para saida", Font_7x10,BLACK,WHITE);
+	   ST7735_WriteString(1, 20,"O botao Y para retorno", Font_7x10,BLACK,WHITE);
+	   ST7735_WriteString(1, 40, "Alunos fora:", Font_7x10,BLACK,WHITE);
+	   ST7735_WriteString(95, 40,"3", Font_7x10,BLACK,WHITE);
+	   ST7735_WriteString(1, 60, "Presenca do dia:", Font_7x10,BLACK,WHITE);
+	   ST7735_WriteString(115, 60,"37/40", Font_7x10,BLACK,WHITE);
+	   ST7735_FillScreen(WHITE);
+	  	  }
+
+	  else if (muda == 4) {  //funcionalidade 6
+	   ST7735_WriteString(1, 5,"Total de alunos", Font_7x10,BLACK,WHITE);
+	   ST7735_WriteString(1, 20,"presentes: 37/40", Font_7x10,BLACK,WHITE);
+	   ST7735_WriteString(1, 60,"Total de saidas: 14", Font_7x10,BLACK,WHITE);
+	  }
+
+	  else if(muda == 5) { //funçao bloqueio (vai ser usado em algumas funcionalidades)
+		 ST7735_FillScreen(WHITE);
+		 ST7735_WriteString(5, 10, "Limite de alunos", Font_7x10,BLACK,WHITE); //func 3
+		 ST7735_WriteString(5, 25, "excedido", Font_7x10,BLACK,WHITE);
+		 ST7735_FillScreen(WHITE);
+		 ST7735_WriteString(5, 10, "Limite de alunos fora de sala excedido", Font_7x10,BLACK,WHITE); //func 4
+		 ST7735_FillScreen(WHITE);
+		 ST7735_WriteString(5, 10, "Tentativas de senha", Font_7x10,BLACK,WHITE); //func 1
+		 ST7735_WriteString(5, 25, "excedido", Font_7x10,BLACK,WHITE);
+	  }
 
   }
   /* USER CODE END 3 */
