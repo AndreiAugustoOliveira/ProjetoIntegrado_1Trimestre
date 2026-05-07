@@ -49,7 +49,9 @@ int Stage = 0;
 GPIO_PinState botao_UP, botao_LEFT, botao_RIGHT, botao_DOWN;
 int nums[4] = {0, 0, 0 , 0};
 int senha = 0, i = 0, senha_input = 0;
+int Tentativas = 0;
 int students = 0;
+int TotalSaidas = 0;
 bool Confirm = 0;
 /* USER CODE END PV */
 
@@ -277,8 +279,9 @@ void Authentication()
 		else
 			nums[i]++;
 		senha_input = nums[0] * 1000 + nums[1] * 100 + nums[2] * 10 + nums[3];
+		ST7735_WriteString(5, 10, "Senha:", Font_11x18,BLACK,WHITE);
 		sprintf(input_str, "%d", senha_input);
-		ST7735_WriteString(40, 5, input_str, Font_11x18,BLACK,WHITE);
+		ST7735_WriteString(10, 10, input_str, Font_11x18,BLACK,WHITE);
 		HAL_Delay(200);
 	}
 	else if(botao_UP == 0 && i == 4)
@@ -291,6 +294,24 @@ void Authentication()
 			Stage++;
 			ST7735_FillScreen(WHITE);
 			return;
+		}
+		else
+		{
+			Tentativas++;
+			if(Tentativas == 3)
+			{
+				ST7735_FillScreen(WHITE);
+				ST7735_WriteString(5, 10, "Tentativas de senha", Font_7x10,BLACK,WHITE);
+				ST7735_WriteString(5, 25, "excedido", Font_7x10,BLACK,WHITE);
+				ST7735_WriteString(5, 40, "Dispositivo bloqueado por 20s", Font_7x10,BLACK,WHITE);
+				HAL_Delay(20000);
+				ST7735_FillScreen(WHITE);
+			}
+			else
+			{
+				ST7735_WriteString(25, 40, "Senha incorreta", Font_7x10,BLACK,WHITE);
+				HAL_Delay(2000);
+			}
 		}
 	}
 
@@ -372,8 +393,7 @@ int ControlePresenca()
 	{
 		if(botao_UP == 0)
 		{
-			//input manual, já que nao tem o sistema de reconhecimento facial.
-			presenca[id] = 1;
+			presenca[id] = 1;	//input manual, já que nao tem o sistema de reconhecimento facial.
 			HAL_Delay(200);
 		}
 
@@ -412,10 +432,14 @@ void RoomControl()
 		if(botao_UP == 0 && OutOfRoom != 3)
 		{
 			OutOfRoom++;
+			TotalSaidas++;
 		}
 		else if(botao_UP == 0 && OutOfRoom == 3)
 		{
-			//Mensagem de erro;
+			ST7735_FillScreen(WHITE);
+			ST7735_WriteString(5, 10, "Limite de alunos", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 25, "fora de sala excedido", Font_7x10,BLACK,WHITE);
+			ST7735_FillScreen(WHITE);
 		}
 
 		if(botao_DOWN == 0 && OutOfRoom != 0)
@@ -424,7 +448,10 @@ void RoomControl()
 		}
 		else if(botao_DOWN == 0 && OutOfRoom == 0)
 		{
-			//Mensagem de erro;
+			ST7735_FillScreen(WHITE);
+			ST7735_WriteString(5, 10, "Nao ha nenhum aluno", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 25, "fora da sala", Font_7x10,BLACK,WHITE);
+			ST7735_FillScreen(WHITE);
 		}
 
 		if(botao_LEFT == 0 & botao_RIGHT == 0)
