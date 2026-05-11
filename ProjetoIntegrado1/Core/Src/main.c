@@ -47,7 +47,7 @@ SPI_HandleTypeDef hspi1;
 /* USER CODE BEGIN PV */
 int Stage = 0;
 GPIO_PinState botao_UP, botao_LEFT, botao_RIGHT, botao_DOWN;
-int nums[4] = {0, 0, 0 , 0};
+int nums[4] = {1, 0, 0 , 0};
 int senha = 0, i = 0, senha_input = 0;
 int Tentativas = 0;
 int students = 0;
@@ -100,8 +100,12 @@ int main(void)
   /* USER CODE BEGIN 2 */
   ST7735_Init();
 
-  ST7735_Test();
+  //ST7735_Test();
   int Presentes = 0;
+  ST7735_FillScreen(WHITE);
+  ST7735_WriteString(5, 10, "Clique o botao", Font_7x10,BLACK,WHITE);
+  ST7735_WriteString(5, 25, "superior para", Font_7x10,BLACK,WHITE);
+  ST7735_WriteString(5, 40, "gerar a senha", Font_7x10,BLACK,WHITE);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -226,7 +230,8 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(ST7735_CS_GPIO_Port, ST7735_CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, ST7735_DC_Pin|ST7735_RES_Pin|Led_4_Pin|Led_3_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, ST7735_DC_Pin|ST7735_RES_Pin|Led_4_Pin|Led_3_Pin
+                          |Led_2_Pin|Led_1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : ST7735_CS_Pin */
   GPIO_InitStruct.Pin = ST7735_CS_Pin;
@@ -235,8 +240,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(ST7735_CS_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : ST7735_DC_Pin ST7735_RES_Pin Led_4_Pin Led_3_Pin */
-  GPIO_InitStruct.Pin = ST7735_DC_Pin|ST7735_RES_Pin|Led_4_Pin|Led_3_Pin;
+  /*Configure GPIO pins : ST7735_DC_Pin ST7735_RES_Pin Led_4_Pin Led_3_Pin
+                           Led_2_Pin Led_1_Pin */
+  GPIO_InitStruct.Pin = ST7735_DC_Pin|ST7735_RES_Pin|Led_4_Pin|Led_3_Pin
+                          |Led_2_Pin|Led_1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -255,6 +262,7 @@ int PasswordGenerator()
 {
 	int seed = HAL_GetTick();
 	int senha = rand() % 10000;
+	ST7735_FillScreen(WHITE);
 	ST7735_WriteString(20, 35, "Gerando a senha!", Font_7x10,BLACK,WHITE);
 	HAL_Delay(1000);
 	ST7735_FillScreen(WHITE);
@@ -266,11 +274,16 @@ int PasswordGenerator()
 
 void Authentication()
 {
-	char input_str[6];
+
 
 	if(botao_UP == 0 && senha == 0)
 	{
 		senha = PasswordGenerator();
+		senha_input = nums[0] * 1000 + nums[1] * 100 + nums[2] * 10 + nums[3];
+		LengthAdjuster(senha_input);
+		ST7735_WriteString(10, 50, "^", Font_11x18, 0x001F, WHITE);
+		ST7735_WriteString(21, 50, "^^^", Font_11x18, BLACK, WHITE);
+		ST7735_WriteString(65, 35, "*", Font_11x18, BLACK, WHITE);
 	}
 	else if(botao_UP == 0 && senha != 0 && i != 4)
 	{
@@ -279,10 +292,8 @@ void Authentication()
 		else
 			nums[i]++;
 		senha_input = nums[0] * 1000 + nums[1] * 100 + nums[2] * 10 + nums[3];
-		ST7735_WriteString(5, 10, "Senha:", Font_11x18,BLACK,WHITE);
-		sprintf(input_str, "%d", senha_input);
-		ST7735_WriteString(10, 10, input_str, Font_11x18,BLACK,WHITE);
-		HAL_Delay(200);
+		LengthAdjuster(senha_input);
+		HAL_Delay(300);
 	}
 	else if(botao_UP == 0 && i == 4)
 	{
@@ -303,14 +314,22 @@ void Authentication()
 				ST7735_FillScreen(WHITE);
 				ST7735_WriteString(5, 10, "Tentativas de senha", Font_7x10,BLACK,WHITE);
 				ST7735_WriteString(5, 25, "excedido", Font_7x10,BLACK,WHITE);
-				ST7735_WriteString(5, 40, "Dispositivo bloqueado por 20s", Font_7x10,BLACK,WHITE);
+				ST7735_WriteString(5, 40, "Dispositivo bloqueado", Font_7x10,BLACK,WHITE);
+				ST7735_WriteString(5, 55, "por 20s", Font_7x10,BLACK,WHITE);
 				HAL_Delay(20000);
 				ST7735_FillScreen(WHITE);
+				//senha_input = nums[0] * 1000 + nums[1] * 100 + nums[2] * 10 + nums[3];
+				LengthAdjuster(senha_input);
+				Tentativas = 0;
 			}
 			else
 			{
+				ST7735_FillScreen(WHITE);
 				ST7735_WriteString(25, 40, "Senha incorreta", Font_7x10,BLACK,WHITE);
-				HAL_Delay(2000);
+				HAL_Delay(4000);
+				ST7735_FillScreen(WHITE);
+				//senha_input = nums[0] * 1000 + nums[1] * 100 + nums[2] * 10 + nums[3];
+				LengthAdjuster(senha_input);
 			}
 		}
 	}
@@ -318,13 +337,71 @@ void Authentication()
 	if(botao_LEFT == 0 && i != 0 && senha != 0)
 	{
 		i--;
+		switch(i)
+		{
+			case 0:
+				ST7735_WriteString(10, 50, "^", Font_11x18, 0x001F, WHITE);
+				ST7735_WriteString(21, 50, "^^^", Font_11x18, BLACK, WHITE);
+				ST7735_WriteString(65, 35, "*", Font_11x18, BLACK, WHITE);
+				break;
+			case 1:
+				ST7735_WriteString(10, 50, "^", Font_11x18, BLACK, WHITE);
+				ST7735_WriteString(21, 50, "^", Font_11x18, 0x001F, WHITE);
+				ST7735_WriteString(32, 50, "^^", Font_11x18, BLACK, WHITE);
+				ST7735_WriteString(65, 35, "*", Font_11x18, BLACK, WHITE);
+				break;
+			case 2:
+				ST7735_WriteString(10, 50, "^^", Font_11x18, BLACK, WHITE);
+				ST7735_WriteString(32, 50, "^", Font_11x18, 0x001F, WHITE);
+				ST7735_WriteString(43, 50, "^", Font_11x18, BLACK, WHITE);
+				ST7735_WriteString(65, 35, "*", Font_11x18, BLACK, WHITE);
+				break;
+			case 3:
+				ST7735_WriteString(10, 50, "^^^", Font_11x18, BLACK, WHITE);
+				ST7735_WriteString(43, 50, "^", Font_11x18, 0x001F, WHITE);
+				ST7735_WriteString(65, 35, "*", Font_11x18, BLACK, WHITE);
+				break;
+			case 4:
+				ST7735_WriteString(10, 50, "^^^^", Font_11x18, BLACK, WHITE);
+				ST7735_WriteString(65, 35, "*", Font_11x18, 0x001F, WHITE);
+				break;
+		}
 		HAL_Delay(200);
 	}
 
 	if(botao_RIGHT == 0 && i != 4 && senha != 0)
 	{
 		i++;
-		HAL_Delay(200);
+		switch(i)
+		{
+		case 0:
+			ST7735_WriteString(10, 50, "^", Font_11x18, 0x001F, WHITE);
+			ST7735_WriteString(21, 50, "^^^", Font_11x18, BLACK, WHITE);
+			ST7735_WriteString(65, 35, "*", Font_11x18, BLACK, WHITE);
+			break;
+		case 1:
+			ST7735_WriteString(10, 50, "^", Font_11x18, BLACK, WHITE);
+			ST7735_WriteString(21, 50, "^", Font_11x18, 0x001F, WHITE);
+			ST7735_WriteString(32, 50, "^^", Font_11x18, BLACK, WHITE);
+			ST7735_WriteString(65, 35, "*", Font_11x18, BLACK, WHITE);
+			break;
+		case 2:
+			ST7735_WriteString(10, 50, "^^", Font_11x18, BLACK, WHITE);
+			ST7735_WriteString(32, 50, "^", Font_11x18, 0x001F, WHITE);
+			ST7735_WriteString(43, 50, "^", Font_11x18, BLACK, WHITE);
+			ST7735_WriteString(65, 35, "*", Font_11x18, BLACK, WHITE);
+			break;
+		case 3:
+			ST7735_WriteString(10, 50, "^^^", Font_11x18, BLACK, WHITE);
+			ST7735_WriteString(43, 50, "^", Font_11x18, 0x001F, WHITE);
+			ST7735_WriteString(65, 35, "*", Font_11x18, BLACK, WHITE);
+			break;
+		case 4:
+			ST7735_WriteString(10, 50, "^^^^", Font_11x18, BLACK, WHITE);
+			ST7735_WriteString(65, 35, "*", Font_11x18, 0x001F, WHITE);
+			break;
+		}
+		HAL_Delay(400);
 	}
 
 	if(botao_DOWN == 0 && senha != 0 && i != 4)
@@ -334,9 +411,8 @@ void Authentication()
 		else
 			nums[i]--;
 		senha_input = nums[0] * 1000 + nums[1] * 100 + nums[2] * 10 + nums[3];
-		sprintf(input_str, "%d", senha_input);
-		ST7735_WriteString(40, 5, input_str, Font_11x18,BLACK,WHITE);
-		HAL_Delay(200);
+		LengthAdjuster(senha_input);
+		HAL_Delay(400);
 	}
 }
 
@@ -466,6 +542,38 @@ void RoomControl()
 void EoDReport()
 {
 	Stage++;
+}
+
+void LengthAdjuster(int senha_input)
+{
+	char input_str[6];
+	if(senha_input >= 1000)
+	{
+		ST7735_WriteString(5, 10, "Senha:", Font_11x18,BLACK,WHITE);
+		sprintf(input_str, "%d", senha_input);
+		ST7735_WriteString(10, 30, input_str, Font_11x18,BLACK,WHITE);
+	}
+	else if(senha_input >= 100)
+	{
+		ST7735_WriteString(5, 10, "Senha:", Font_11x18,BLACK,WHITE);
+		sprintf(input_str, "%d", senha_input);
+		ST7735_WriteString(10, 30, "0", Font_11x18,BLACK,WHITE);
+		ST7735_WriteString(21, 30, input_str, Font_11x18,BLACK,WHITE);
+	}
+	else if(senha_input >= 10)
+	{
+		ST7735_WriteString(5, 10, "Senha:", Font_11x18,BLACK,WHITE);
+		sprintf(input_str, "%d", senha_input);
+		ST7735_WriteString(10, 30, "00", Font_11x18,BLACK,WHITE);
+		ST7735_WriteString(32, 30, input_str, Font_11x18,BLACK,WHITE);
+	}
+	else
+	{
+		ST7735_WriteString(5, 10, "Senha:", Font_11x18,BLACK,WHITE);
+		sprintf(input_str, "%d", senha_input);
+		ST7735_WriteString(10, 30, "000", Font_11x18,BLACK,WHITE);
+		ST7735_WriteString(43, 30, input_str, Font_11x18,BLACK,WHITE);
+	}
 }
 /* USER CODE END 4 */
 
