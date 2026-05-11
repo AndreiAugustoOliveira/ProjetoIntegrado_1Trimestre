@@ -45,7 +45,7 @@
 SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
-int Stage = 0;
+int Stage = 1;
 GPIO_PinState botao_UP, botao_LEFT, botao_RIGHT, botao_DOWN;
 int nums[4] = {1, 0, 0 , 0};
 int senha = 0, i = 0, senha_input = 0;
@@ -53,6 +53,7 @@ int Tentativas = 0;
 int students = 0;
 int TotalSaidas = 0;
 bool Confirm = 0;
+bool bootStage = 1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -103,9 +104,6 @@ int main(void)
   //ST7735_Test();
   int Presentes = 0;
   ST7735_FillScreen(WHITE);
-  ST7735_WriteString(5, 10, "Clique o botao", Font_7x10,BLACK,WHITE);
-  ST7735_WriteString(5, 25, "superior para", Font_7x10,BLACK,WHITE);
-  ST7735_WriteString(5, 40, "gerar a senha", Font_7x10,BLACK,WHITE);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -274,7 +272,13 @@ int PasswordGenerator()
 
 void Authentication()
 {
-
+	if(bootStage)
+	{
+		ST7735_WriteString(5, 10, "Clique o botao", Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(5, 25, "superior para", Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(5, 40, "gerar a senha", Font_7x10,BLACK,WHITE);
+		bootStage = 0;
+	}
 
 	if(botao_UP == 0 && senha == 0)
 	{
@@ -304,6 +308,7 @@ void Authentication()
 			HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 0);
 			Stage++;
 			ST7735_FillScreen(WHITE);
+			bootStage = 1;
 			return;
 		}
 		else
@@ -420,39 +425,67 @@ void ClassLimit()
 {
 	char input_str[2];
 
-	if(botao_RIGHT == 0 && Confirm == 0)
+	if(bootStage)
 	{
-		//Texto de confirmação
+		ST7735_FillScreen(WHITE);
+		ST7735_WriteString(5, 50, "Aperte botao", Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(5, 60, "superior ou inferior", Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(5, 70, "para finalizar", Font_7x10,BLACK,WHITE);
+		bootStage = 0;
+	}
+
+	if(botao_UP == 0 && Confirm == 0)
+	{
+		ST7735_WriteString(5, 50, "Aperte novamente", Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(5, 65, "para confirmar", Font_7x10,BLACK,WHITE);
 		Confirm = 1;
 	}
-	else if(botao_RIGHT == 0 && Confirm == 1)
+	else if(botao_UP == 0 && Confirm == 1)
 	{
-		//Confirmação para usuário
-		//Delay para possibilitar leitura
+		ST7735_FillScreen(WHITE);
+		ST7735_WriteString(5, 15, "Num de alunos", Font_11x18,BLACK,WHITE);
+		ST7735_WriteString(5, 33, "definido", Font_11x18,BLACK,WHITE);
 		HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 1);
 		HAL_Delay(300);
 		HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 0);
 		Stage++;
+		bootStage = 1;
 		return;
 	}
 
-	if(botao_UP == 0)
+	if(botao_RIGHT == 0 && students != 99)
 	{
 		Confirm = 0;
 		students++;
-		HAL_Delay(200);
 		sprintf(input_str, "%d", students);
-		ST7735_WriteString(40, 5, input_str, Font_11x18,BLACK,WHITE);
+		ST7735_WriteString(5, 5, "Quant. Alunos:", Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(5, 15, "-", Font_11x18,BLACK,WHITE);
+		if(students >= 10)
+		{
+			ST7735_WriteString(35, 15, "+", Font_11x18,WHITE,WHITE);
+			ST7735_WriteString(46, 15, "+", Font_11x18,BLACK,WHITE);
+		}
+		else
+		{
+			if(input)
+			ST7735_WriteString(46, 15, "+", Font_11x18,WHITE,WHITE);
+			ST7735_WriteString(35, 15, "+", Font_11x18,BLACK,WHITE);
+		}
+		ST7735_WriteString(20, 15, input_str, Font_11x18,BLACK,WHITE);
+		HAL_Delay(200);
 
 	}
 
-	if(botao_DOWN == 0)
+	if(botao_LEFT == 0 && students != 0)
 	{
 		Confirm = 0;
 		students--;
-		HAL_Delay(200);
 		sprintf(input_str, "%d", students);
-		ST7735_WriteString(40, 5, input_str, Font_11x18,BLACK,WHITE);
+		ST7735_WriteString(5, 5, "Quant. Alunos:", Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(5, 15, "-", Font_11x18,BLACK,WHITE);
+		ST7735_WriteString(20, 15, input_str, Font_11x18,BLACK,WHITE);
+		ST7735_WriteString(35, 15, "+", Font_11x18,BLACK,WHITE);
+		HAL_Delay(200);
 	}
 
 	if(botao_LEFT == 0)
@@ -475,7 +508,8 @@ int ControlePresenca()
 
 		if(botao_RIGHT == 0 && confirm == 0)
 		{
-			//Texto de confirmação
+			ST7735_WriteString(5, 65, "Aperte novamente", Font_11x18,BLACK,WHITE);
+			ST7735_WriteString(5, 80, "para confirmar", Font_11x18,BLACK,WHITE);
 			confirm = 1;
 		}
 		else if (botao_RIGHT == 0 && confirm == 1)
