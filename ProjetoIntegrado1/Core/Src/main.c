@@ -45,7 +45,7 @@
 SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
-int Stage = 1;
+int Stage = 2;
 GPIO_PinState botao_UP, botao_LEFT, botao_RIGHT, botao_DOWN;
 int nums[4] = {1, 0, 0 , 0};
 int senha = 0, i = 0, senha_input = 0;
@@ -432,6 +432,11 @@ void ClassLimit()
 		ST7735_WriteString(5, 50, "Aperte botao", Font_7x10,BLACK,WHITE);
 		ST7735_WriteString(5, 60, "superior ou inferior", Font_7x10,BLACK,WHITE);
 		ST7735_WriteString(5, 70, "para finalizar", Font_7x10,BLACK,WHITE);
+		sprintf(input_str, "%d", students);
+		ST7735_WriteString(5, 5, "Quant. Alunos:", Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(5, 15, "-", Font_11x18,BLACK,WHITE);
+		ST7735_WriteString(20, 15, input_str, Font_11x18,BLACK,WHITE);
+		ST7735_WriteString(35, 15, "+", Font_11x18,BLACK,WHITE);
 		bootStage = 0;
 		Text = 0;
 	}
@@ -548,25 +553,29 @@ void ClassLimit()
 
 int ControlePresenca()
 {
-	bool presenca[students];
-	bool confirm = 0;
+	int presenca[presenca];
 	int id = 0, presentes = 0;
 
-	while(1)
-	{
+		if(bootStage)
+		{
+			ST7735_FillScreen(WHITE);
+			Confirm = 0;
+			bootStage = 0;
+		}
 		if(botao_UP == 0)
 		{
 			presenca[id] = 1;	//input manual, já que nao tem o sistema de reconhecimento facial.
 			HAL_Delay(200);
 		}
 
-		if(botao_RIGHT == 0 && confirm == 0)
+		if(botao_RIGHT == 0 && Confirm == 0)
 		{
-			ST7735_WriteString(5, 65, "Aperte novamente", Font_11x18,BLACK,WHITE);
-			ST7735_WriteString(5, 80, "para confirmar", Font_11x18,BLACK,WHITE);
-			confirm = 1;
+			ST7735_WriteString(5, 50, "Aperte botao", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 60, "superior ou inferior", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 70, "para finalizar", Font_7x10,BLACK,WHITE);
+			Confirm = 1;
 		}
-		else if (botao_RIGHT == 0 && confirm == 1)
+		else if (botao_RIGHT == 0 && Confirm == 1)
 		{
 			HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 1);
 			HAL_Delay(300);
@@ -579,8 +588,6 @@ int ControlePresenca()
 			}
 			return presentes;
 		}
-
-	}
 }
 
 void RoomControl()
