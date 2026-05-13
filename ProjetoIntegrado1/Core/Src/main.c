@@ -54,6 +54,7 @@ int students = 0;
 int TotalSaidas = 0;
 bool Confirm = 0;
 bool bootStage = 1;
+bool Text = false;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -432,12 +433,18 @@ void ClassLimit()
 		ST7735_WriteString(5, 60, "superior ou inferior", Font_7x10,BLACK,WHITE);
 		ST7735_WriteString(5, 70, "para finalizar", Font_7x10,BLACK,WHITE);
 		bootStage = 0;
+		Text = 0;
 	}
 
 	if(botao_UP == 0 && Confirm == 0)
 	{
+		ST7735_WriteString(5, 50, "Aperte botao", Font_7x10,WHITE,WHITE);
+		ST7735_WriteString(5, 60, "superior ou inferior", Font_7x10,WHITE,WHITE);
+		ST7735_WriteString(5, 70, "para finalizar", Font_7x10,WHITE,WHITE);
 		ST7735_WriteString(5, 50, "Aperte novamente", Font_7x10,BLACK,WHITE);
 		ST7735_WriteString(5, 65, "para confirmar", Font_7x10,BLACK,WHITE);
+		HAL_Delay(1000);
+		Text = 1;
 		Confirm = 1;
 	}
 	else if(botao_UP == 0 && Confirm == 1)
@@ -457,6 +464,14 @@ void ClassLimit()
 	{
 		Confirm = 0;
 		students++;
+		if(Text)
+		{
+			ST7735_WriteString(5, 50, "Aperte novamente", Font_7x10,WHITE,WHITE);
+			ST7735_WriteString(5, 65, "para confirmar", Font_7x10,WHITE,WHITE);
+			ST7735_WriteString(5, 50, "Aperte botao", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 60, "superior ou inferior", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 70, "para finalizar", Font_7x10,BLACK,WHITE);
+		}
 		sprintf(input_str, "%d", students);
 		ST7735_WriteString(5, 5, "Quant. Alunos:", Font_7x10,BLACK,WHITE);
 		ST7735_WriteString(5, 15, "-", Font_11x18,BLACK,WHITE);
@@ -467,8 +482,8 @@ void ClassLimit()
 		}
 		else
 		{
-			if(input)
 			ST7735_WriteString(46, 15, "+", Font_11x18,WHITE,WHITE);
+			ST7735_WriteString(31, 15, "+", Font_11x18,WHITE,WHITE);
 			ST7735_WriteString(35, 15, "+", Font_11x18,BLACK,WHITE);
 		}
 		ST7735_WriteString(20, 15, input_str, Font_11x18,BLACK,WHITE);
@@ -480,16 +495,55 @@ void ClassLimit()
 	{
 		Confirm = 0;
 		students--;
+		if(Text)
+		{
+			ST7735_WriteString(5, 50, "Aperte novamente", Font_7x10,WHITE,WHITE);
+			ST7735_WriteString(5, 65, "para confirmar", Font_7x10,WHITE,WHITE);
+			ST7735_WriteString(5, 50, "Aperte botao", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 60, "superior ou inferior", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 70, "para finalizar", Font_7x10,BLACK,WHITE);
+		}
 		sprintf(input_str, "%d", students);
 		ST7735_WriteString(5, 5, "Quant. Alunos:", Font_7x10,BLACK,WHITE);
 		ST7735_WriteString(5, 15, "-", Font_11x18,BLACK,WHITE);
+		if(students >= 10)
+		{
+			ST7735_WriteString(35, 15, "+", Font_11x18,WHITE,WHITE);
+			ST7735_WriteString(46, 15, "+", Font_11x18,BLACK,WHITE);
+		}
+		else
+		{
+			ST7735_WriteString(46, 15, "+", Font_11x18,WHITE,WHITE);
+			ST7735_WriteString(31, 15, "+", Font_11x18,WHITE,WHITE);
+			ST7735_WriteString(35, 15, "+", Font_11x18,BLACK,WHITE);
+		}
 		ST7735_WriteString(20, 15, input_str, Font_11x18,BLACK,WHITE);
-		ST7735_WriteString(35, 15, "+", Font_11x18,BLACK,WHITE);
 		HAL_Delay(200);
 	}
 
-	if(botao_LEFT == 0)
-		Confirm = 0;
+	if(botao_DOWN == 0 && Confirm == 0)
+	{
+		ST7735_WriteString(5, 50, "Aperte botao", Font_7x10,WHITE,WHITE);
+		ST7735_WriteString(5, 60, "superior ou inferior", Font_7x10,WHITE,WHITE);
+		ST7735_WriteString(5, 70, "para finalizar", Font_7x10,WHITE,WHITE);
+		ST7735_WriteString(5, 50, "Aperte novamente", Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(5, 65, "para confirmar", Font_7x10,BLACK,WHITE);
+		HAL_Delay(1000);
+		Text = 1;
+		Confirm = 1;
+	}
+	else if(botao_DOWN == 0 && Confirm == 1)
+	{
+		ST7735_FillScreen(WHITE);
+		ST7735_WriteString(5, 15, "Num de alunos", Font_11x18,BLACK,WHITE);
+		ST7735_WriteString(5, 33, "definido", Font_11x18,BLACK,WHITE);
+		HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 1);
+		HAL_Delay(300);
+		HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 0);
+		Stage++;
+		bootStage = 1;
+		return;
+	}
 }
 
 int ControlePresenca()
