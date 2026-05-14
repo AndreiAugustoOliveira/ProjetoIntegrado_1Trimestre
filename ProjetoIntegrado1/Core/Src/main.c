@@ -45,12 +45,12 @@
 SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
-int Stage = 2;
+int Stage = 3;
 GPIO_PinState botao_UP, botao_LEFT, botao_RIGHT, botao_DOWN;
 int nums[4] = {1, 0, 0 , 0};
 int senha = 0, i = 0, senha_input = 0;
 int Tentativas = 0;
-int students = 0;
+int students = 2;
 int TotalSaidas = 0;
 bool Confirm = 0;
 bool bootStage = 1;
@@ -553,39 +553,71 @@ void ClassLimit()
 
 int ControlePresenca()
 {
-	int presenca[presenca];
 	int id = 0, presentes = 0;
 
 		if(bootStage)
 		{
 			ST7735_FillScreen(WHITE);
+			ST7735_WriteString(5, 50, "Aperte botao", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 60, "superior = presente", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 70, "direita = finalizar", Font_7x10,BLACK,WHITE);
 			Confirm = 0;
 			bootStage = 0;
 		}
 		if(botao_UP == 0)
 		{
-			presenca[id] = 1;	//input manual, já que nao tem o sistema de reconhecimento facial.
+			if(presentes == students)
+			{
+				ST7735_FillScreen(WHITE);
+				ST7735_WriteString(5, 13, "Erro: Aluno", Font_7x10,BLACK,WHITE);
+				ST7735_WriteString(5, 23, "excedente a qntd", Font_7x10,BLACK,WHITE);
+				ST7735_WriteString(5, 33, "esperada", Font_7x10,BLACK,WHITE);
+				HAL_Delay(1000);
+				ST7735_WriteString(5, 13, "Erro: Aluno", Font_7x10,WHITE,WHITE);
+				ST7735_WriteString(5, 23, "excedente a qntd", Font_7x10,WHITE,WHITE);
+				ST7735_WriteString(5, 33, "esperada", Font_7x10, WHITE,WHITE);
+			}
+			else
+			{
+				ST7735_FillScreen(WHITE);
+			//Face ID Insert
+			char id_str[4];
+			sprintf(id_str, "%d", id);
+			ST7735_WriteString(5, 13,  "Aluno numero:", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 23,  id_str, Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 33,  "presente", Font_7x10,BLACK,WHITE);
+			presentes++;
+			HAL_Delay(600);
+			ST7735_WriteString(5, 13,  "Aluno numero:", Font_7x10,WHITE,WHITE);
+			ST7735_WriteString(5, 23,  id_str, Font_7x10,WHITE,WHITE);
+			ST7735_WriteString(5, 33,  "presente", Font_7x10,WHITE,WHITE);
+			}
+				ST7735_WriteString(5, 50, "Aperte botao", Font_7x10,BLACK,WHITE);
+				ST7735_WriteString(5, 60, "superior = presente", Font_7x10,BLACK,WHITE);
+				ST7735_WriteString(5, 70, "direita = finalizar", Font_7x10,BLACK,WHITE);
 			HAL_Delay(200);
 		}
 
 		if(botao_RIGHT == 0 && Confirm == 0)
 		{
-			ST7735_WriteString(5, 50, "Aperte botao", Font_7x10,BLACK,WHITE);
-			ST7735_WriteString(5, 60, "superior ou inferior", Font_7x10,BLACK,WHITE);
-			ST7735_WriteString(5, 70, "para finalizar", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 50, "Aperte botao", Font_7x10,WHITE,WHITE);
+			ST7735_WriteString(5, 60, "superior = presente", Font_7x10,WHITE,WHITE);
+			ST7735_WriteString(5, 70, "direita = finalizar", Font_7x10,WHITE,WHITE);
+			ST7735_WriteString(5, 50, "Aperte novamente", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 65, "para confirmar", Font_7x10,BLACK,WHITE);
 			Confirm = 1;
+			HAL_Delay(400);
 		}
 		else if (botao_RIGHT == 0 && Confirm == 1)
 		{
+			ST7735_FillScreen(WHITE);
+			ST7735_WriteString(5, 15, "Chamada", Font_11x18,BLACK,WHITE);
+			ST7735_WriteString(5, 33, "encerrada", Font_11x18,BLACK,WHITE);
 			HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 1);
 			HAL_Delay(300);
 			HAL_GPIO_WritePin(Led_4_GPIO_Port, Led_4_Pin, 0);
 			Stage++;
-			for(int j = 0; j < students; j ++)
-			{
-				if(presenca[j] == 1)
-					presentes++;
-			}
+			bootStage = 1;
 			return presentes;
 		}
 }
@@ -600,34 +632,97 @@ void RoomControl()
 		botao_RIGHT = HAL_GPIO_ReadPin(Button_RIGHT_GPIO_Port, Button_RIGHT_Pin);
 		botao_DOWN = HAL_GPIO_ReadPin(Button_DOWN_GPIO_Port, Button_DOWN_Pin);
 
-		if(botao_UP == 0 && OutOfRoom != 3)
+		if(bootStage)
 		{
+			ST7735_FillScreen(WHITE);
+			ST7735_WriteString(5, 5, "Alunos fora:", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 15,"0", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 30, "Aperte botao", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 40, "superior = sair", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 50, "inferior = chegar", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 60, "direita = encerrar", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 70, "esquerda = encerrar", Font_7x10,BLACK,WHITE);
+			bootStage = 0;
+		}
+
+		if(botao_UP == 0 && (OutOfRoom != 3 && OutOfRoom != students))
+		{
+			if(Confirm)
+				RoomControlPanelSet();
+			ST7735_WriteString(5, 5, "Alunos fora:", Font_7x10,BLACK,WHITE);
+			char out_str[1];
 			OutOfRoom++;
+			sprintf(out_str, "%d", OutOfRoom);
+			ST7735_WriteString(5, 15,out_str, Font_7x10,BLACK,WHITE);
+			HAL_Delay(300);
 			TotalSaidas++;
 		}
-		else if(botao_UP == 0 && OutOfRoom == 3)
+		else if(botao_UP == 0 && (OutOfRoom == 3 || OutOfRoom == students))
 		{
+			Confirm = 0;
 			ST7735_FillScreen(WHITE);
-			ST7735_WriteString(5, 10, "Limite de alunos", Font_7x10,BLACK,WHITE);
-			ST7735_WriteString(5, 25, "fora de sala excedido", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 5, "Limite de alunos", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 15, "fora de sala excedido", Font_7x10,BLACK,WHITE);
+			HAL_Delay(750);
 			ST7735_FillScreen(WHITE);
+			ST7735_WriteString(5, 5, "Alunos fora:", Font_7x10,BLACK,WHITE);
+			char out_str[1];
+			sprintf(out_str, "%d", OutOfRoom);
+			ST7735_WriteString(5, 15,out_str, Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 30, "Aperte botao", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 40, "superior = sair", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 50, "inferior = chegar", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 60, "direita = encerrar", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 70, "esquerda = encerrar", Font_7x10,BLACK,WHITE);
 		}
 
 		if(botao_DOWN == 0 && OutOfRoom != 0)
 		{
+			if(Confirm)
+			{
+				RoomControlPanelSet();
+			}
+			ST7735_WriteString(5, 5, "Alunos fora:", Font_7x10,BLACK,WHITE);
+			char out_str[1];
 			OutOfRoom--;
+			sprintf(out_str, "%d", OutOfRoom);
+			ST7735_WriteString(5, 15,out_str, Font_7x10,BLACK,WHITE);
+			HAL_Delay(300);
 		}
 		else if(botao_DOWN == 0 && OutOfRoom == 0)
 		{
+			Confirm = 0;
 			ST7735_FillScreen(WHITE);
-			ST7735_WriteString(5, 10, "Nao ha nenhum aluno", Font_7x10,BLACK,WHITE);
-			ST7735_WriteString(5, 25, "fora da sala", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 5, "Nao ha nenhum aluno", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 15, "fora da sala", Font_7x10,BLACK,WHITE);
+			HAL_Delay(750);
 			ST7735_FillScreen(WHITE);
+			ST7735_WriteString(5, 5, "Alunos fora:", Font_7x10,BLACK,WHITE);
+			char out_str[1];
+			sprintf(out_str, "%d", OutOfRoom);
+			ST7735_WriteString(5, 15,out_str, Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 30, "Aperte botao", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 40, "superior = sair", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 50, "inferior = chegar", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 60, "direita = encerrar", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 70, "esquerda = encerrar", Font_7x10,BLACK,WHITE);
 		}
 
-		if(botao_LEFT == 0 & botao_RIGHT == 0)
+		if((botao_LEFT == 0 || botao_RIGHT == 0) && Confirm == 1)
 		{
-			//Mensagem de turno encerrado;
+			ST7735_FillScreen(WHITE);
+			ST7735_WriteString(5, 10, "Turno", Font_11x18,BLACK,WHITE);
+			ST7735_WriteString(5, 25, "encerrado", Font_11x18,BLACK,WHITE);
+			Stage++;
+			return;
+		}
+		else if((botao_LEFT == 0 || botao_RIGHT == 0) && Confirm == 0)
+		{
+			ST7735_FillScreen(WHITE);
+			ST7735_WriteString(5, 50, "Aperte novamente", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 65, "para confirmar", Font_7x10,BLACK,WHITE);
+			Confirm = 1;
+			HAL_Delay(400);
 			Stage++;
 			return;
 		}
@@ -669,6 +764,17 @@ void LengthAdjuster(int senha_input)
 		ST7735_WriteString(10, 30, "000", Font_11x18,BLACK,WHITE);
 		ST7735_WriteString(43, 30, input_str, Font_11x18,BLACK,WHITE);
 	}
+}
+
+void RoomControlPanelSet()
+{
+	ST7735_FillScreen(WHITE);
+	ST7735_WriteString(5, 30, "Aperte botao", Font_7x10,BLACK,WHITE);
+	ST7735_WriteString(5, 40, "superior = sair", Font_7x10,BLACK,WHITE);
+	ST7735_WriteString(5, 50, "inferior = chegar", Font_7x10,BLACK,WHITE);
+	ST7735_WriteString(5, 60, "direita = encerrar", Font_7x10,BLACK,WHITE);
+	ST7735_WriteString(5, 70, "esquerda = encerrar", Font_7x10,BLACK,WHITE);
+	Confirm = 0;
 }
 /* USER CODE END 4 */
 
