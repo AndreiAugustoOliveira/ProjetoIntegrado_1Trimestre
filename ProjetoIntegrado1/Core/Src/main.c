@@ -704,11 +704,11 @@ void RoomControl()
 			ST7735_WriteString(5, 30, "Aperte botao", Font_7x10,BLACK,WHITE);
 			ST7735_WriteString(5, 40, "superior = sair", Font_7x10,BLACK,WHITE);
 			ST7735_WriteString(5, 50, "inferior = chegar", Font_7x10,BLACK,WHITE);
-			ST7735_WriteString(5, 60, "direita = encerrar", Font_7x10,BLACK,WHITE);
-			ST7735_WriteString(5, 70, "esquerda = encerrar", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 60, "direita e esquerda", Font_7x10,BLACK,WHITE);
+			ST7735_WriteString(5, 70, "encerra o turno", Font_7x10,BLACK,WHITE);
 		}
 
-		if((botao_LEFT == 0 || botao_RIGHT == 0) && Confirm == 1)
+		if((botao_LEFT == 0 && botao_RIGHT == 0) && Confirm == 1)
 		{
 			ST7735_FillScreen(WHITE);
 			ST7735_WriteString(5, 10, "Turno", Font_11x18,BLACK,WHITE);
@@ -716,12 +716,13 @@ void RoomControl()
 			Stage++;
 			return;
 		}
-		else if((botao_LEFT == 0 || botao_RIGHT == 0) && Confirm == 0)
+		else if((botao_LEFT == 0 && botao_RIGHT == 0) && Confirm == 0)
 		{
 			ST7735_FillScreen(WHITE);
 			ST7735_WriteString(5, 50, "Aperte novamente", Font_7x10,BLACK,WHITE);
 			ST7735_WriteString(5, 65, "para confirmar", Font_7x10,BLACK,WHITE);
 			Confirm = 1;
+			bootStage = 1;
 			HAL_Delay(400);
 			Stage++;
 			return;
@@ -731,7 +732,32 @@ void RoomControl()
 
 void EoDReport()
 {
-	Stage++;
+	char out_str[2], students_str[2];
+	sprintf(out_str, "%d", TotalSaidas);
+	sprintf(students_str, "%d", students);
+
+	if(bootStage)
+	{
+		ST7735_FillScreen(WHITE);
+		ST7735_WriteString(5, 5, "Total de alunos", Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(5, 15, "registrados:", Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(100, 15, students_str, Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(5, 25, "Total de saidas", Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(5, 35, "registradas:", Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(100, 35, out_str, Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(5, 45, "Aperte qualquer", Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(5, 55, "botao p encerrar", Font_7x10,BLACK,WHITE);
+		HAL_Delay(1000);
+		bootStage = 0;
+	}
+	if(botao_RIGHT == 0 || botao_LEFT == 0 || botao_UP == 0 || botao_DOWN == 0)
+	{
+		ST7735_WriteString(5, 10, "Programa", Font_11x18,BLACK,WHITE);
+		ST7735_WriteString(5, 25, "encerrado", Font_11x18,BLACK,WHITE);
+		HAL_Delay(10000);
+		ST7735_FillScreen(WHITE);
+		Stage++;
+	}
 }
 
 void LengthAdjuster(int senha_input)
