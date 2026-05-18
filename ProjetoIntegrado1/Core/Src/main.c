@@ -51,6 +51,7 @@ int nums[4] = {1, 0, 0 , 0};
 int senha = 0, i = 0, senha_input = 0;
 int Tentativas = 0;
 int students = 2;
+int presentes = 0;
 int TotalSaidas = 0;
 bool Confirm = 0;
 bool bootStage = 1;
@@ -130,7 +131,7 @@ int main(void)
 	  else if (Stage == 3)
 		  RoomControl();
 	  else if(Stage == 4)
-		  EoDReport();
+		  EoDReport(Presentes);
 
 
   }
@@ -553,7 +554,7 @@ void ClassLimit()
 
 int ControlePresenca()
 {
-	int id = 0, presentes = 0;
+	int id = 0;
 
 		if(bootStage)
 		{
@@ -622,7 +623,7 @@ int ControlePresenca()
 		}
 }
 
-void RoomControl()
+void RoomControl(int presentes)
 {
 	int OutOfRoom = 0;
 	while(1)
@@ -645,7 +646,7 @@ void RoomControl()
 			bootStage = 0;
 		}
 
-		if(botao_UP == 0 && (OutOfRoom != 3 && OutOfRoom != students))
+		if(botao_UP == 0 && (OutOfRoom != 3 && OutOfRoom != presentes))
 		{
 			if(Confirm)
 				RoomControlPanelSet();
@@ -657,7 +658,7 @@ void RoomControl()
 			HAL_Delay(300);
 			TotalSaidas++;
 		}
-		else if(botao_UP == 0 && (OutOfRoom == 3 || OutOfRoom == students))
+		else if(botao_UP == 0 && (OutOfRoom == 3 || OutOfRoom == presentes))
 		{
 			Confirm = 0;
 			ST7735_FillScreen(WHITE);
@@ -731,19 +732,22 @@ void RoomControl()
 	}
 }
 
-void EoDReport()
+void EoDReport(int Presentes)
 {
-	char out_str[2], students_str[2];
+	char out_str[2], students_str[2], presentes_str[2];
 	sprintf(out_str, "%d", TotalSaidas);
 	sprintf(students_str, "%d", students);
+	sprintf(presentes_str, "%d", Presentes);
 
 		ST7735_FillScreen(WHITE);
 		ST7735_WriteString(5, 5, "Total de alunos", Font_7x10,BLACK,WHITE);
-		ST7735_WriteString(5, 15, "registrados:", Font_7x10,BLACK,WHITE);
-		ST7735_WriteString(100, 15, students_str, Font_7x10,BLACK,WHITE);
-		ST7735_WriteString(5, 25, "Total de saidas", Font_7x10,BLACK,WHITE);
-		ST7735_WriteString(5, 35, "registradas:", Font_7x10,BLACK,WHITE);
-		ST7735_WriteString(100, 35, out_str, Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(5, 15, "presentes:", Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(5, 25, presentes_str, Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(26, 25, "/", Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(40, 25, students_str, Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(5, 35, "Total de saidas", Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(5, 45, "registradas:", Font_7x10,BLACK,WHITE);
+		ST7735_WriteString(100, 45, out_str, Font_7x10,BLACK,WHITE);
 		ST7735_WriteString(5, 55, "Encerramento em", Font_7x10,BLACK,WHITE);
 		ST7735_WriteString(5, 65, "1 minuto", Font_7x10,BLACK,WHITE);
 		HAL_Delay(60000);
