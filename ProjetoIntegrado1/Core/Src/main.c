@@ -45,7 +45,7 @@
 SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
-int Stage = 3;
+int Stage = 0;
 GPIO_PinState botao_UP, botao_LEFT, botao_RIGHT, botao_DOWN;
 int nums[4] = {1, 0, 0 , 0};
 int senha = 0, i = 0, senha_input = 0;
