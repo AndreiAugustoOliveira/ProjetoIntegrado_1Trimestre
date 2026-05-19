@@ -2,4 +2,4 @@
 
 Projeto Integrado feito por Andrei Augusto Oliveira e Daniel Martins Maia do Couto
 
-Vídeo do Youtube: [Work In Progress]
+Vídeo do Youtube: (https://youtu.be/LMtqJGa1-Yk)
